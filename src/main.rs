@@ -7,20 +7,20 @@ struct Window {
     label: String,
     name: String,
     monitor_id: String,
-    bits_per_pixel: u8,
-    width: u8,
-    height: u8,
-    display_flags: u8,
-    display_frequency: u8,
-    display_orientation: u8,
-    position_x: u8,
-    position_y: u8,
+    bits_per_pixel: ConfigEntry<u16>,
+    width: ConfigEntry<u16>,
+    height: ConfigEntry<u16>,
+    display_flags: ConfigEntry<u16>,
+    display_frequency: ConfigEntry<u16>,
+    display_orientation: ConfigEntry<u16>,
+    position_x: ConfigEntry<i32>,
+    position_y: ConfigEntry<i32>,
 }
 
 #[allow(dead_code)]
-struct ConfigEntry {
+struct ConfigEntry <V> {
     name: String,
-    value: u8, // TODO make this generic
+    value: V, // TODO make this generic
 }
 
 
@@ -95,29 +95,56 @@ mod multi_monitor_tool {
     fn create_window(config_lines: &mut Vec<String>) -> super::Window {
         let window = super::Window {
             label: config_lines.remove(0),
-            // name: config_lines.remove(1),
-            // monitor_id: config_lines.remove(2),
-            // bits_per_pixel: config_lines.remove(3).parse().unwrap(),
-            // width: config_lines.remove(4).parse().unwrap(),
-            // height: config_lines.remove(5).parse().unwrap(),
-            // display_flags: config_lines.remove(6).parse().unwrap(),
-            // display_frequency: config_lines.remove(7).parse().unwrap(),
-            // display_orientation: config_lines.remove(8).parse().unwrap(),
-            // position_x: config_lines.remove(9).parse().unwrap(),
-            // position_y: config_lines.remove(10).parse().unwrap(),
-
-            name: "".to_string(),
-            monitor_id: "".to_string(),
-            bits_per_pixel: 1,
-            width: 1,
-            height: 1,
-            display_flags: 1,
-            display_frequency: 1,
-            display_orientation: 1,
-            position_x: 1,
-            position_y: 1,
-            
+            name: config_lines.remove(1),
+            monitor_id: config_lines.remove(2),
+            bits_per_pixel: parse_entry_u16(config_lines.remove(3)),
+            width: parse_entry_u16(config_lines.remove(4)),
+            height: parse_entry_u16(config_lines.remove(5)),
+            display_flags: parse_entry_u16(config_lines.remove(6)),
+            display_frequency: parse_entry_u16(config_lines.remove(7)),
+            display_orientation: parse_entry_u16(config_lines.remove(8)),
+            position_x: parse_entry_i32(config_lines.remove(9)),
+            position_y: parse_entry_i32(config_lines.remove(10)),
         };
         return window;
+    }
+
+    fn parse_entry_u16(line: String) -> super::ConfigEntry<u16> {
+        let mut sp: Vec<&str> = line.split("=").collect();
+        // sp.len() is 1, not parsing the 0 for some reason. "DisplayFlags=0"
+        let name: String = sp.remove(0).to_string();
+        print!("Line: {}", line);
+        let value: u16 = match sp.remove(1).parse::<u16>() {
+            Ok(value) => value,
+            Err(e) => {
+                panic!("Issue parsing config entry! {:?}", e);
+            }
+        };
+        print!("Name: {}, value {}", name, value);
+        let entry = super::ConfigEntry {
+            name,
+            value
+        };
+
+        return entry;
+    }
+
+    fn parse_entry_i32(line: String) -> super::ConfigEntry<i32> {
+        let mut sp: Vec<&str> = line.split("=").collect();
+        let name: String = sp.remove(0).to_string();
+
+        let value: i32 = match sp.remove(1).parse::<i32>() {
+            Ok(value) => value,
+            Err(e) => {
+                panic!("Issue parsing config entry! {:?}", e);
+            }
+        };
+        print!("Name: {}, value {}", name, value);
+        let entry = super::ConfigEntry {
+            name,
+            value
+        };
+
+        return entry;
     }
 }
