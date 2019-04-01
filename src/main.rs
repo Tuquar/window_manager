@@ -17,6 +17,10 @@ struct Window {
     position_y: u8,
 }
 
+
+// cargo run -- -m dev
+// cargo run -- -h
+// https://rust-lang-nursery.github.io/rust-cookbook/cli/arguments.html#parse-command-line-arguments
 fn main() {
     let matches = App::new("Window Manager")
     .version("0.1.0")
@@ -57,13 +61,16 @@ mod multi_monitor_tool {
 
         let config_lines = read_config_file().expect("could not find config file");
         for line in config_lines {
-            // println!("{}", line);
+            println!("{}", line);
             if line.starts_with("[") {
-                println!("New---");
+                println!("--New Monitor--");
+                println!("--Length {}--", window.len());
+                if window.len() >= 1 {
                     windows.push(create_window(&mut window));
                     // Issue with pointers. You need to learn pass by reference/value more thoroughly
-                    window.clear()
+                    window.clear();
                     // window = Vec::new();
+                }
             }
             window.push(line);
         }
@@ -85,22 +92,30 @@ mod multi_monitor_tool {
     }
 
     fn create_window(config_lines: &mut Vec<String>) -> super::Window {
-        println!("Lines -> {}", config_lines[0]);
         let window = super::Window {
             label: config_lines.remove(0),
             // name: config_lines.remove(1),
-            // monitor_id: config_lines.remove(1),
-            // label: config_lines[0].parse().unwrap(),
-            name: config_lines[1].parse().unwrap(),
-            monitor_id: config_lines[2].parse().unwrap(),
-            bits_per_pixel: config_lines[3].parse().unwrap(),
-            width: config_lines[4].parse().unwrap(),
-            height: config_lines[5].parse().unwrap(),
-            display_flags: config_lines[6].parse().unwrap(),
-            display_frequency: config_lines[7].parse().unwrap(),
-            display_orientation: config_lines[8].parse().unwrap(),
-            position_x: config_lines[9].parse().unwrap(),
-            position_y: config_lines[10].parse().unwrap(),
+            // monitor_id: config_lines.remove(2),
+            // bits_per_pixel: config_lines.remove(3).parse().unwrap(),
+            // width: config_lines.remove(4).parse().unwrap(),
+            // height: config_lines.remove(5).parse().unwrap(),
+            // display_flags: config_lines.remove(6).parse().unwrap(),
+            // display_frequency: config_lines.remove(7).parse().unwrap(),
+            // display_orientation: config_lines.remove(8).parse().unwrap(),
+            // position_x: config_lines.remove(9).parse().unwrap(),
+            // position_y: config_lines.remove(10).parse().unwrap(),
+
+            name: "".to_string(),
+            monitor_id: "".to_string(),
+            bits_per_pixel: 1,
+            width: 1,
+            height: 1,
+            display_flags: 1,
+            display_frequency: 1,
+            display_orientation: 1,
+            position_x: 1,
+            position_y: 1,
+            
         };
         return window;
     }
