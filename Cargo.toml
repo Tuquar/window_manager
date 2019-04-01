@@ -1,0 +1,7 @@
+[package]
+name = "wmgr"
+version = "0.1.0"
+authors = ["Tuquar <mattlennon3@hotmail.co.uk>"]
+
+[dependencies]
+clap = "2.32.0"
