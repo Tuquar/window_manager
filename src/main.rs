@@ -17,6 +17,12 @@ struct Window {
     position_y: u8,
 }
 
+#[allow(dead_code)]
+struct ConfigEntry {
+    name: String,
+    value: u8, // TODO make this generic
+}
+
 
 // cargo run -- -m dev
 // cargo run -- -h
@@ -61,20 +67,15 @@ mod multi_monitor_tool {
 
         let config_lines = read_config_file().expect("could not find config file");
         for line in config_lines {
-            println!("{}", line);
-            if line.starts_with("[") {
-                println!("--New Monitor--");
-                println!("--Length {}--", window.len());
-                if window.len() >= 1 {
-                    windows.push(create_window(&mut window));
-                    // Issue with pointers. You need to learn pass by reference/value more thoroughly
-                    window.clear();
-                    // window = Vec::new();
-                }
+            // println!("L-{}", line);
+            if line.starts_with("PositionY") {
+                windows.push(create_window(&mut window));
+                window.clear();
+                // println!("--New Monitor--");
             }
             window.push(line);
         }
-        println!("Wlength: {}", windows.len());
+        println!("Connected Monitors: {}", windows.len());
 
         fn read_config_file() ->  Result<Vec<String>>{
             return BufReader::new(File::open(CONFIG_LOCATION)?).lines().collect();
