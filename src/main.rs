@@ -3,7 +3,7 @@ extern crate clap;
 use clap::{Arg, App};
 
 #[allow(dead_code)]
-struct Window {
+pub struct Window {
     label: String,
     name: String,
     monitor_id: String,
@@ -20,7 +20,7 @@ struct Window {
 #[allow(dead_code)]
 struct ConfigEntry <V> {
     name: String,
-    value: V, // TODO make this generic
+    value: V,
 }
 
 
@@ -44,7 +44,7 @@ fn main() {
     println!("Selected mode: {}", mode);
 
     multi_monitor_tool::get_config();
-    multi_monitor_tool::parse_config();
+    let monitors: Vec<Window> = multi_monitor_tool::parse_config();
     
 }
 
@@ -57,70 +57,66 @@ mod multi_monitor_tool {
     const MULTI_MONITOR_EXE: &str = "MultiMonitorTool";
     const CONFIG_LOCATION: &str = ".\\config\\monitorconfig.ini";
 
+    fn read_config_file() ->  Result<Vec<String>>{
+        return BufReader::new(File::open(CONFIG_LOCATION)?).lines().collect();
+    }
     pub fn get_config() {
         Command::new(MULTI_MONITOR_EXE).arg("/Saveconfig").arg(CONFIG_LOCATION).output().expect("");
     }
-
-    pub fn parse_config() {
+    pub fn parse_config() -> Vec<super::Window> {
         let mut windows: Vec<super::Window> = Vec::new();
         let mut window: Vec<String> = Vec::new();
 
         let config_lines = read_config_file().expect("could not find config file");
         for line in config_lines {
             // println!("L-{}", line);
-            if line.starts_with("PositionY") {
+            window.push(line);
+            let mut new_monitor = false;
+            match window.last() {
+                Some(l) => {
+                    if l.starts_with("PositionY") {
+                        new_monitor = true;
+                    }
+                },
+                None => continue
+            }
+
+            if new_monitor {
+                // println!("--New Monitor--");
                 windows.push(create_window(&mut window));
                 window.clear();
-                // println!("--New Monitor--");
             }
-            window.push(line);
         }
         println!("Connected Monitors: {}", windows.len());
-
-        fn read_config_file() ->  Result<Vec<String>>{
-            return BufReader::new(File::open(CONFIG_LOCATION)?).lines().collect();
-            // let config_file = File::open(CONFIG_LOCATION)?;
-            // let mut buf_reader = BufReader::new(config_file);
-            // let mut contents = String::new();
-            // buf_reader.read_to_string(&mut contents)?;
-            // Ok(())
-        }
-        
-            // match config_file {
-            //     Ok (x) => print!("ace"),
-            //     Err (e) => print!("Poo"),
-            // };
+        return windows;
     }
 
     fn create_window(config_lines: &mut Vec<String>) -> super::Window {
         let window = super::Window {
             label: config_lines.remove(0),
-            name: config_lines.remove(1),
-            monitor_id: config_lines.remove(2),
-            bits_per_pixel: parse_entry_u16(config_lines.remove(3)),
-            width: parse_entry_u16(config_lines.remove(4)),
-            height: parse_entry_u16(config_lines.remove(5)),
-            display_flags: parse_entry_u16(config_lines.remove(6)),
-            display_frequency: parse_entry_u16(config_lines.remove(7)),
-            display_orientation: parse_entry_u16(config_lines.remove(8)),
-            position_x: parse_entry_i32(config_lines.remove(9)),
-            position_y: parse_entry_i32(config_lines.remove(10)),
+            name: config_lines.remove(0),
+            monitor_id: config_lines.remove(0),
+            bits_per_pixel: parse_entry_u16(config_lines.remove(0)),
+            width: parse_entry_u16(config_lines.remove(0)),
+            height: parse_entry_u16(config_lines.remove(0)),
+            display_flags: parse_entry_u16(config_lines.remove(0)),
+            display_frequency: parse_entry_u16(config_lines.remove(0)),
+            display_orientation: parse_entry_u16(config_lines.remove(0)),
+            position_x: parse_entry_i32(config_lines.remove(0)),
+            position_y: parse_entry_i32(config_lines.remove(0)),
         };
         return window;
     }
 
     fn parse_entry_u16(line: String) -> super::ConfigEntry<u16> {
         let mut sp: Vec<&str> = line.split("=").collect();
-        // sp.len() is 1, not parsing the 0 for some reason. "DisplayFlags=0"
         let name: String = sp.remove(0).to_string();
-        print!("Line: {}", line);
-        let value: u16 = match sp.remove(1).parse::<u16>() {
+        let value: u16 = match sp.remove(0).parse::<u16>() {
             Ok(value) => value,
             Err(e) => {
                 panic!("Issue parsing config entry! {:?}", e);
             }
         };
-        print!("Name: {}, value {}", name, value);
         let entry = super::ConfigEntry {
             name,
             value
@@ -133,13 +129,12 @@ mod multi_monitor_tool {
         let mut sp: Vec<&str> = line.split("=").collect();
         let name: String = sp.remove(0).to_string();
 
-        let value: i32 = match sp.remove(1).parse::<i32>() {
+        let value: i32 = match sp.remove(0).parse::<i32>() {
             Ok(value) => value,
             Err(e) => {
                 panic!("Issue parsing config entry! {:?}", e);
             }
         };
-        print!("Name: {}, value {}", name, value);
         let entry = super::ConfigEntry {
             name,
             value
