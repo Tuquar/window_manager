@@ -9,7 +9,7 @@ pub struct ConfigEntry <V> {
 }
 
 #[allow(dead_code)]
-pub struct Window {
+pub struct Monitor {
     label: String,
     name: String,
     monitor_id: String,
@@ -44,7 +44,7 @@ fn main() {
     println!("Selected mode: {}", mode);
 
     multi_monitor_tool::multi_monitor_tool::get_config();
-    let monitors: Vec<Window> = multi_monitor_tool::multi_monitor_tool::parse_config();
+    let monitors: Vec<Monitor> = multi_monitor_tool::multi_monitor_tool::parse_config();
     
 }
 

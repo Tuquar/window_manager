@@ -1,4 +1,4 @@
-use Window;
+use Monitor;
 use ConfigEntry;
 
 pub mod multi_monitor_tool {
@@ -16,16 +16,16 @@ pub mod multi_monitor_tool {
     pub fn get_config() {
         Command::new(MULTI_MONITOR_EXE).arg("/Saveconfig").arg(CONFIG_LOCATION).output().expect("");
     }
-    pub fn parse_config() -> Vec<super::Window> {
-        let mut windows: Vec<super::Window> = Vec::new();
-        let mut window: Vec<String> = Vec::new();
+    pub fn parse_config() -> Vec<super::Monitor> {
+        let mut monitors: Vec<super::Monitor> = Vec::new();
+        let mut monitor: Vec<String> = Vec::new();
 
         let config_lines = read_config_file().expect("could not find config file");
         for line in config_lines {
             // println!("L-{}", line);
-            window.push(line);
+            monitor.push(line);
             let mut new_monitor = false;
-            match window.last() {
+            match monitor.last() {
                 Some(l) => {
                     if l.starts_with("PositionY") {
                         new_monitor = true;
@@ -36,16 +36,16 @@ pub mod multi_monitor_tool {
 
             if new_monitor {
                 // println!("--New Monitor--");
-                windows.push(create_window(&mut window));
-                window.clear();
+                monitors.push(create_monitor(&mut monitor));
+                monitor.clear();
             }
         }
-        println!("Connected Monitors: {}", windows.len());
-        return windows;
+        println!("Connected Monitors: {}", monitors.len());
+        return monitors;
     }
 
-    fn create_window(config_lines: &mut Vec<String>) -> super::Window {
-        let window = super::Window {
+    fn create_monitor(config_lines: &mut Vec<String>) -> super::Monitor {
+        let monitor = super::Monitor {
             label: config_lines.remove(0),
             name: config_lines.remove(0),
             monitor_id: config_lines.remove(0),
@@ -58,7 +58,7 @@ pub mod multi_monitor_tool {
             position_x: parse_entry_i32(config_lines.remove(0)),
             position_y: parse_entry_i32(config_lines.remove(0)),
         };
-        return window;
+        return monitor;
     }
 
     fn parse_entry_u16(line: String) -> super::ConfigEntry<u16> {
