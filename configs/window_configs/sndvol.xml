@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<window>
+    <name>Volume Mixer</name>
+    <process_name>SndVol.exe</process_name>
+    <width>443</width>
+    <height>350</height>
+    <offset_left>627</offset_left>
+    <offset_top>1438</offset_top>
+</window>

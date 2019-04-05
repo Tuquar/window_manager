@@ -8,7 +8,7 @@ pub mod multi_monitor_tool {
 
     //Docs http://www.nirsoft.net/utils/multi_monitor_tool.html
     const MULTI_MONITOR_EXE: &str = "MultiMonitorTool";
-    const CONFIG_LOCATION: &str = ".\\config\\monitorconfig.ini";
+    const CONFIG_LOCATION: &str = ".\\configs\\monitorconfig.ini";
 
     fn read_config_file() ->  Result<Vec<String>>{
         return BufReader::new(File::open(CONFIG_LOCATION)?).lines().collect();
